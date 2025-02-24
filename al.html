@@ -1,0 +1,922 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kalkulator Fisika [pengembangan]</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* --- CSS Style (Sama seperti versi terakhir, tidak ada perubahan signifikan terkait penjelasan) --- */
+        /* Warna-warna utama Ruangguru Style (bisa disesuaikan) */
+        :root {
+            --primary-color: #00B9BD;
+            --secondary-color: #FFC700;
+            --accent-color: #FF5733;
+            --background-color: #F0F7FA;
+            --card-background: #FFFFFF;
+            --text-color-dark: #343a40;
+            --text-color-light: #6c757d;
+            --border-color: #ced4da;
+        }
+
+        body {
+            font-family: 'Nunito Sans', sans-serif;
+            margin: 20px;
+            background-color: var(--background-color);
+            color: var(--text-color-dark);
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 95vh;
+        }
+
+        .container {
+            max-width: 800px;
+            padding: 30px;
+            background-color: var(--card-background);
+            border-radius: 15px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            text-align: center;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            font-size: 2.5em;
+            font-weight: 800;
+        }
+
+        p[style="text-align: center;"] {
+            color: var(--text-color-light);
+            margin-bottom: 30px;
+            line-height: 1.7;
+        }
+
+        .formula-select-container {
+            margin-bottom: 40px;
+        }
+
+        .formula-select-container label {
+            display: block;
+            margin-bottom: 15px;
+            font-weight: 700;
+            font-size: 1.2em;
+            color: var(--text-color-dark);
+        }
+
+        select {
+            padding: 15px;
+            border-radius: 10px;
+            border: 2px solid var(--border-color);
+            margin-bottom: 25px;
+            width: calc(100% - 34px);
+            box-sizing: border-box;
+            font-size: 1.1em;
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            background-image: url('data:image/svg+xml;utf8,<svg fill="currentColor" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/><path d="M0 0h24v24H0z" fill="none"/></svg>');
+            background-repeat: no-repeat;
+            background-position-x: right 15px;
+            background-position-y: center;
+        }
+
+        select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 5px rgba(0, 185, 189, 0.5);
+        }
+
+
+        .calculator-section {
+            margin-bottom: 40px;
+            padding: 30px;
+            border: none;
+            border-radius: 12px;
+            background-color: var(--card-background);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+        }
+
+        .calculator-section h2 {
+            color: var(--primary-color);
+            text-align: left;
+            font-size: 1.8em;
+            margin-top: 0;
+            margin-bottom: 25px;
+        }
+
+        .formula-description {
+            font-style: italic;
+            color: var(--text-color-light);
+            margin-bottom: 20px;
+            font-size: 1.1em;
+        }
+
+        .formula-display {
+            font-size: 1.3em;
+            font-weight: 700;
+            margin-bottom: 20px;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border: 1px dashed var(--border-color);
+            border-radius: 8px;
+            text-align: center;
+            font-family: 'Courier New', monospace;
+            color: var(--primary-color);
+        }
+
+        .input-group {
+            margin-bottom: 25px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: var(--text-color-dark);
+        }
+
+        .input-group input[type="number"] {
+            width: calc(100% - 34px);
+            padding: 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            margin-bottom: 15px;
+            font-size: 1.1em;
+            box-sizing: border-box;
+        }
+
+        .input-group input[type="number"]:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 5px rgba(0, 185, 189, 0.5);
+        }
+
+
+        .calculate-button {
+            padding: 15px 25px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1.2em;
+            font-weight: 600;
+            transition: background-color 0.3s ease;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
+        }
+
+        .calculate-button:hover {
+            background-color: #00898C;
+        }
+
+        .output-group {
+            margin-top: 30px;
+            padding: 20px;
+            border: 2px solid var(--primary-color);
+            border-radius: 10px;
+            background-color: #e0f7fa;
+        }
+
+        .output-group p {
+            margin: 10px 0;
+            font-size: 1.1em;
+        }
+
+        #hasilOutput, #hasilKecepatan, #hasilEnergiKinetik, #hasilNewton2, #hasilEnergiPotensial, #hasilMomentum, #hasilImpuls {
+            font-weight: 700;
+            color: var(--accent-color);
+            font-size: 1.2em;
+            margin-top: 5px;
+        }
+
+        /* Style untuk Area Penjelasan Langkah-Langkah dan Visualisasi */
+        .explanation-area, .visualization-area {
+            margin-top: 30px;
+            padding: 25px;
+            border: 2px solid var(--border-color);
+            border-radius: 10px;
+            background-color: var(--card-background);
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.05);
+            display: none; /* Secara default SEMUA area penjelasan TERSEMBUNYI */
+        }
+
+        .explanation-area h3, .visualization-area h3 {
+            color: var(--primary-color);
+            margin-top: 0;
+            margin-bottom: 15px;
+            font-size: 1.5em;
+            font-weight: 700;
+        }
+
+        .explanation-area p, .explanation-area ul, .explanation-area ol, .example-box p {
+            line-height: 1.8;
+            color: var(--text-color-dark);
+        }
+
+        .visualization-area {
+            min-height: 250px;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-style: dashed;
+            color: var(--text-color-light);
+            font-size: 1.1em;
+        }
+
+        .show-explanation-button, .hide-explanation-button {
+            padding: 10px 18px;
+            margin-top: 15px;
+            background-color: var(--secondary-color);
+            color: var(--text-color-dark);
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 600;
+            transition: background-color 0.3s ease;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .show-explanation-button:hover, .hide-explanation-button:hover {
+            background-color: #f0b700;
+        }
+
+        .example-box {
+            padding: 20px;
+            margin: 20px 0;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            background-color: #fefefe;
+        }
+
+        .example-box h4 {
+            margin-top: 0;
+            margin-bottom: 15px;
+            font-size: 1.2em;
+            color: var(--primary-color);
+            font-weight: 700;
+        }
+
+        .example-box p {
+            margin-bottom: 10px;
+            font-size: 1.05em;
+        }
+
+
+    </style>
+    <link href='https://fonts.googleapis.com/css?family=Nunito+Sans:400,700,800' rel='stylesheet'>
+</head>
+<body>
+    <div class="container">
+        <h1>Kalkulator Fisika pengembangan</h1>
+        <p style="text-align: center;">kalkulator nya masih pengembangan jadi mungin ada beberpa eror yah wirrr mohon kerja samanya <br> <i> (dalam pengembangan)</i></p>
+
+        <div class="formula-select-container">
+            <label for="formulaSelect">Pilih Rumus Fisika:</label>
+            <select id="formulaSelect" onchange="tampilkanForm()">
+                <option value="">-- Pilih Rumus --</option>
+                <option value="kecepatan">Kecepatan (v = s / t)</option>
+                <option value="energiKinetik">Energi Kinetik (EK = 0.5 * m * v^2)</option>
+                <option value="hukumNewton2">Hukum Newton II (F = m * a)</option>
+                <option value="energiPotensial">Energi Potensial Gravitasi (EP = m * g * h)</option>
+                <option value="momentum">Momentum (p = m * v)</option>
+                <option value="impuls">Impuls (I = F * Δt)</option>
+            </select>
+        </div>
+
+        <div id="kecepatanForm" class="calculator-section" style="display:none;">
+            <h2>Kalkulator Kecepatan</h2>
+            <div class="formula-description">Rumus Kecepatan:</div>
+            <div class="formula-display">v = s / t</div>
+            <div class="input-group">
+                <label for="jarakKecepatan">Jarak (s):</label>
+                <input type="number" id="jarakKecepatan" placeholder="Masukkan jarak">
+            </div>
+            <div class="input-group">
+                <label for="waktuKecepatan">Waktu (t):</label>
+                <input type="number" id="waktuKecepatan" placeholder="Masukkan waktu">
+            </div>
+            <button class="calculate-button" onclick="hitungKecepatan()">Hitung Kecepatan</button>
+            <button class="show-explanation-button" onclick="tampilkanPenjelasan('kecepatan')">Tampilkan Penjelasan & Contoh</button>
+            <div class="output-group">
+                <p>Hasil Kecepatan:</p>
+                <p id="hasilKecepatan">---</p>
+            </div>
+            <div id="penjelasanKecepatan" class="explanation-area">
+                <h3>Penjelasan Rumus Kecepatan</h3>
+                <p>Kecepatan adalah besaran yang menggambarkan seberapa cepat suatu benda bergerak dan arah geraknya. Dalam fisika, kecepatan dihitung sebagai perubahan posisi (perpindahan) suatu benda dalam selang waktu tertentu.</p>
+                <p>Rumus kecepatan rata-rata adalah:</p>
+                <div class="formula-display">v = s / t</div>
+                <p>Dimana:</p>
+                <ul>
+                    <li><code>v</code> = kecepatan rata-rata (biasanya dalam meter per detik atau m/s)</li>
+                    <li><code>s</code> = jarak tempuh atau perpindahan (biasanya dalam meter atau m)</li>
+                    <li><code>t</code> = waktu tempuh (biasanya dalam detik atau s)</li>
+                </ul>
+
+                <div class="example-box">
+                    <h4>Contoh Soal:</h4>
+                    <p>Sebuah mobil menempuh jarak 100 meter dalam waktu 10 detik. Hitunglah kecepatan rata-rata mobil tersebut.</p>
+                    <h4>Penyelesaian:</h4>
+                    <ol>
+                        <li><b>Diketahui:</b>
+                            <ul>
+                                <li>Jarak (s) = 100 meter</li>
+                                <li>Waktu (t) = 10 detik</li>
+                            </ul>
+                        </li>
+                        <li><b>Ditanya:</b> Kecepatan (v)</li>
+                        <li><b>Rumus:</b>
+                            <div class="formula-display">v = s / t</div>
+                        </li>
+                        <li><b>Penyelesaian:</b>
+                            <div class="formula-display">v = 100 m / 10 s</div>
+                            <div class="formula-display">v = 10 m/s</div>
+                        </li>
+                    </ol>
+                    <p><b>Jawaban:</b> Kecepatan rata-rata mobil tersebut adalah 10 m/s.</p>
+                </div>
+
+                <p><b>Langkah menggunakan kalkulator ini:</b></p>
+                <ol>
+                    <li>Masukkan nilai jarak (s) pada kolom 'Jarak'.</li>
+                    <li>Masukkan nilai waktu (t) pada kolom 'Waktu'.</li>
+                    <li>Klik tombol 'Hitung Kecepatan'.</li>
+                    <li>Hasil kecepatan akan muncul di bagian 'Hasil Kecepatan'.</li>
+                </ol>
+
+                <button class="hide-explanation-button" onclick="sembunyikanPenjelasan('kecepatan')">Sembunyikan Penjelasan</button>
+            </div>
+            <div id="visualisasiKecepatan" class="visualization-area">
+                <h3>Visualisasi Kecepetan (Akan Hadir)</h3>
+                <p><i>Area ini akan menampilkan visualisasi interaktif dari konsep kecepatan.</i></p>
+            </div>
+        </div>
+
+        <div id="energiKinetikForm" class="calculator-section" style="display:none;">
+            <h2>Kalkulator Energi Kinetik</h2>
+            <div class="formula-description">Rumus Energi Kinetik:</div>
+            <div class="formula-display">EK = 0.5 * m * v<sup>2</sup></div>
+            <div class="input-group">
+                <label for="massaEnergiKinetik">Massa (m):</label>
+                <input type="number" id="massaEnergiKinetik" placeholder="Masukkan massa">
+            </div>
+            <div class="input-group">
+                <label for="kecepatanEnergiKinetik">Kecepatan (v):</label>
+                <input type="number" id="kecepatanEnergiKinetik" placeholder="Masukkan kecepatan">
+            </div>
+            <button class="calculate-button" onclick="hitungEnergiKinetik()">Hitung Energi Kinetik</button>
+            <button class="show-explanation-button" onclick="tampilkanPenjelasan('energiKinetik')">Tampilkan Penjelasan & Contoh</button>
+            <div class="output-group">
+                <p>Hasil Energi Kinetik:</p>
+                <p id="hasilEnergiKinetik">---</p>
+            </div>
+            <div id="penjelasanEnergiKinetik" class="explanation-area">
+                <h3>Penjelasan Rumus Energi Kinetik</h3>
+                <p>Energi kinetik adalah energi yang dimiliki oleh suatu benda karena gerakannya. Energi ini bergantung pada massa dan kecepatan benda tersebut. Semakin cepat benda bergerak dan semakin besar massanya, semakin besar energi kinetiknya.</p>
+                <p>Rumus energi kinetik adalah:</p>
+                <div class="formula-display">EK = 0.5 * m * v<sup>2</sup></div>
+                <p>Dimana:</p>
+                <ul>
+                    <li><code>EK</code> = Energi Kinetik (biasanya dalam Joule atau J)</li>
+                    <li><code>m</code> = massa benda (biasanya dalam kilogram atau kg)</li>
+                    <li><code>v</code> = kecepatan benda (biasanya dalam meter per detik atau m/s)</li>
+                </ul>
+
+                <div class="example-box">
+                    <h4>Contoh Soal:</h4>
+                    <p>Sebuah sepeda motor dengan massa 100 kg bergerak dengan kecepatan 20 m/s. Berapakah energi kinetik sepeda motor tersebut?</p>
+                    <h4>Penyelesaian:</h4>
+                    <ol>
+                        <li><b>Diketahui:</b>
+                            <ul>
+                                <li>Massa (m) = 100 kg</li>
+                                <li>Kecepatan (v) = 20 m/s</li>
+                            </ul>
+                        </li>
+                        <li><b>Ditanya:</b> Energi Kinetik (EK)</li>
+                        <li><b>Rumus:</b>
+                            <div class="formula-display">EK = 0.5 * m * v<sup>2</sup></div>
+                        </li>
+                        <li><b>Penyelesaian:</b>
+                            <div class="formula-display">EK = 0.5 * 100 kg * (20 m/s)<sup>2</sup></div>
+                            <div class="formula-display">EK = 0.5 * 100 kg * 400 m<sup>2</sup>/s<sup>2</sup></div>
+                            <div class="formula-display">EK = 20000 Joule</div>
+                        </li>
+                    </ol>
+                    <p><b>Jawaban:</b> Energi kinetik sepeda motor tersebut adalah 20000 Joule.</p>
+                </div>
+                <p><b>Langkah menggunakan kalkulator ini:</b></p>
+                <ol>
+                    <li>Masukkan nilai massa (m) pada kolom 'Massa'.</li>
+                    <li>Masukkan nilai kecepatan (v) pada kolom 'Kecepatan'.</li>
+                    <li>Klik tombol 'Hitung Energi Kinetik'.</li>
+                    <li>Hasil energi kinetik akan muncul di bagian 'Hasil Energi Kinetik'.</li>
+                </ol>
+                <button class="hide-explanation-button" onclick="sembunyikanPenjelasan('energiKinetik')">Sembunyikan Penjelasan</button>
+            </div>
+            <div id="visualisasiEnergiKinetik" class="visualization-area">
+                <h3>Visualisasi Energi Kinetik (Akan Hadir)</h3>
+                <p><i>Area ini akan menampilkan visualisasi interaktif dari konsep energi kinetik.</i></p>
+            </div>
+        </div>
+
+        <div id="hukumNewton2Form" class="calculator-section" style="display:none;">
+            <h2>Kalkulator Hukum Newton II</h2>
+            <div class="formula-description">Rumus Hukum Newton II:</div>
+            <div class="formula-display">F = m * a</div>
+            <div class="input-group">
+                <label for="massaNewton2">Massa (m):</label>
+                <input type="number" id="massaNewton2" placeholder="Masukkan massa">
+            </div>
+            <div class="input-group">
+                <label for="percepatanNewton2">Percepatan (a):</label>
+                <input type="number" id="percepatanNewton2" placeholder="Masukkan percepatan">
+            </div>
+            <button class="calculate-button" onclick="hitungHukumNewton2()">Hitung Gaya (F)</button>
+            <button class="show-explanation-button" onclick="tampilkanPenjelasan('hukumNewton2')">Tampilkan Penjelasan & Contoh</button>
+            <div class="output-group">
+                <p>Hasil Gaya (F):</p>
+                <p id="hasilNewton2">---</p>
+            </div>
+            <div id="penjelasanHukumNewton2" class="explanation-area">
+                <h3>Penjelasan Rumus Hukum Newton II</h3>
+                <p>Hukum Newton II menyatakan bahwa percepatan suatu benda berbanding lurus dengan gaya total yang bekerja padanya dan berbanding terbalik dengan massanya. Hukum ini mendefinisikan hubungan antara gaya, massa, dan percepatan dalam gerak lurus.</p>
+                <p>Rumus Hukum Newton II adalah:</p>
+                <div class="formula-display">F = m * a</div>
+                <p>Dimana:</p>
+                <ul>
+                    <li><code>F</code> = Gaya total atau resultan gaya (biasanya dalam Newton atau N)</li>
+                    <li><code>m</code> = massa benda (biasanya dalam kilogram atau kg)</li>
+                    <li><code>a</code> = percepatan benda (biasanya dalam meter per detik kuadrat atau m/s²)</li>
+                </ul>
+
+                <div class="example-box">
+                    <h4>Contoh Soal:</h4>
+                    <p>Sebuah balok dengan massa 2 kg didorong dengan gaya 10 N. Berapakah percepatan balok tersebut?</p>
+                    <h4>Penyelesaian:</h4>
+                    <ol>
+                        <li><b>Diketahui:</b>
+                            <ul>
+                                <li>Gaya (F) = 10 N</li>
+                                <li>Massa (m) = 2 kg</li>
+                            </ul>
+                        </li>
+                        <li><b>Ditanya:</b> Percepatan (a)</li>
+                        <li><b>Rumus:</b>
+                            <div class="formula-display">F = m * a  (diubah menjadi a = F / m)</div>
+                        </li>
+                        <li><b>Penyelesaian:</b>
+                            <div class="formula-display">a = 10 N / 2 kg</div>
+                            <div class="formula-display">a = 5 m/s<sup>2</sup></div>
+                        </li>
+                    </ol>
+                    <p><b>Jawaban:</b> Percepatan balok tersebut adalah 5 m/s².</p>
+                </div>
+
+                <p><b>Langkah menggunakan kalkulator ini:</b></p>
+                <ol>
+                    <li>Masukkan nilai massa (m) pada kolom 'Massa'.</li>
+                    <li>Masukkan nilai percepatan (a) pada kolom 'Percepatan'.</li>
+                    <li>Klik tombol 'Hitung Gaya (F)'.</li>
+                    <li>Hasil gaya (F) akan muncul di bagian 'Hasil Gaya (F)'.</li>
+                </ol>
+                <button class="hide-explanation-button" onclick="sembunyikanPenjelasan('hukumNewton2')">Sembunyikan Penjelasan</button>
+            </div>
+            <div id="visualisasiHukumNewton2" class="visualization-area">
+                <h3>Visualisasi Hukum Newton II (Akan Hadir)</h3>
+                <p><i>Area ini akan menampilkan visualisasi interaktif dari konsep Hukum Newton II.</i></p>
+            </div>
+        </div>
+
+        <div id="energiPotensialForm" class="calculator-section" style="display:none;">
+            <h2>Kalkulator Energi Potensial Gravitasi</h2>
+            <div class="formula-description">Rumus Energi Potensial Gravitasi:</div>
+            <div class="formula-display">EP = m * g * h</div>
+            <div class="input-group">
+                <label for="massaEnergiPotensial">Massa (m):</label>
+                <input type="number" id="massaEnergiPotensial" placeholder="Masukkan massa">
+            </div>
+            <div class="input-group">
+                <label for="gravitasiEnergiPotensial">Gravitasi (g):</label>
+                <input type="number" id="gravitasiEnergiPotensial" value="9.8" placeholder="Masukkan gravitasi (default 9.8 m/s²)">
+            </div>
+            <div class="input-group">
+                <label for="ketinggianEnergiPotensial">Ketinggian (h):</label>
+                <input type="number" id="ketinggianEnergiPotensial" placeholder="Masukkan ketinggian">
+            </div>
+            <button class="calculate-button" onclick="hitungEnergiPotensial()">Hitung Energi Potensial</button>
+            <button class="show-explanation-button" onclick="tampilkanPenjelasan('energiPotensial')">Tampilkan Penjelasan & Contoh</button>
+            <div class="output-group">
+                <p>Hasil Energi Potensial:</p>
+                <p id="hasilEnergiPotensial">---</p>
+            </div>
+            <div id="penjelasanEnergiPotensial" class="explanation-area">
+                <h3>Penjelasan Rumus Energi Potensial Gravitasi</h3>
+                <p>Energi potensial gravitasi adalah energi yang dimiliki suatu benda karena posisinya dalam medan gravitasi. Energi ini bergantung pada massa benda, percepatan gravitasi, dan ketinggian benda dari titik acuan tertentu (biasanya permukaan bumi).</p>
+                <p>Rumus energi potensial gravitasi adalah:</p>
+                <div class="formula-display">EP = m * g * h</div>
+                <p>Dimana:</p>
+                <ul>
+                    <li><code>EP</code> = Energi Potensial Gravitasi (biasanya dalam Joule atau J)</li>
+                    <li><code>m</code> = massa benda (biasanya dalam kilogram atau kg)</li>
+                    <li><code>g</code> = percepatan gravitasi (di permukaan bumi sekitar 9.8 m/s²)</li>
+                    <li><code>h</code> = ketinggian benda dari titik acuan (biasanya dalam meter atau m)</li>
+                </ul>
+
+                <div class="example-box">
+                    <h4>Contoh Soal:</h4>
+                    <p>Sebuah buku dengan massa 0.5 kg berada di rak buku dengan ketinggian 2 meter dari lantai. Berapakah energi potensial gravitasi buku tersebut? (g = 9.8 m/s²)</p>
+                    <h4>Penyelesaian:</h4>
+                    <ol>
+                        <li><b>Diketahui:</b>
+                            <ul>
+                                <li>Massa (m) = 0.5 kg</li>
+                                <li>Percepatan gravitasi (g) = 9.8 m/s²</li>
+                                <li>Ketinggian (h) = 2 meter</li>
+                            </ul>
+                        </li>
+                        <li><b>Ditanya:</b> Energi Potensial Gravitasi (EP)</li>
+                        <li><b>Rumus:</b>
+                            <div class="formula-display">EP = m * g * h</div>
+                        </li>
+                        <li><b>Penyelesaian:</b>
+                            <div class="formula-display">EP = 0.5 kg * 9.8 m/s² * 2 m</div>
+                            <div class="formula-display">EP = 9.8 Joule</div>
+                        </li>
+                    </ol>
+                    <p><b>Jawaban:</b> Energi potensial gravitasi buku tersebut adalah 9.8 Joule.</p>
+                </div>
+
+                <p><b>Langkah menggunakan kalkulator ini:</b></p>
+                <ol>
+                    <li>Masukkan nilai massa (m) pada kolom 'Massa'.</li>
+                    <li>Masukkan nilai gravitasi (g) pada kolom 'Gravitasi' (nilai default 9.8 m/s²).</li>
+                    <li>Masukkan nilai ketinggian (h) pada kolom 'Ketinggian'.</li>
+                    <li>Klik tombol 'Hitung Energi Potensial'.</li>
+                    <li>Hasil energi potensial akan muncul di bagian 'Hasil Energi Potensial'.</li>
+                </ol>
+                <button class="hide-explanation-button" onclick="sembunyikanPenjelasan('energiPotensial')">Sembunyikan Penjelasan</button>
+            </div>
+            <div id="visualisasiEnergiPotensial" class="visualization-area">
+                <h3>Visualisasi Energi Potensial Gravitasi (Akan Hadir)</h3>
+                <p><i>Area ini akan menampilkan visualisasi interaktif dari konsep energi potensial gravitasi.</i></p>
+            </div>
+        </div>
+
+        <div id="momentumForm" class="calculator-section" style="display:none;">
+            <h2>Kalkulator Momentum</h2>
+            <div class="formula-description">Rumus Momentum:</div>
+            <div class="formula-display">p = m * v</div>
+            <div class="input-group">
+                <label for="massaMomentum">Massa (m):</label>
+                <input type="number" id="massaMomentum" placeholder="Masukkan massa">
+            </div>
+            <div class="input-group">
+                <label for="kecepatanMomentum">Kecepatan (v):</label>
+                <input type="number" id="kecepatanMomentum" placeholder="Masukkan kecepatan">
+            </div>
+            <button class="calculate-button" onclick="hitungMomentum()">Hitung Momentum (p)</button>
+            <button class="show-explanation-button" onclick="tampilkanPenjelasan('momentum')">Tampilkan Penjelasan & Contoh</button>
+            <div class="output-group">
+                <p>Hasil Momentum (p):</p>
+                <p id="hasilMomentum">---</p>
+            </div>
+            <div id="penjelasanMomentum" class="explanation-area">
+                <h3>Penjelasan Rumus Momentum</h3>
+                <p>Momentum linear (sering disebut momentum saja) adalah ukuran kecenderungan suatu benda untuk terus bergerak dengan kecepatan tertentu. Momentum adalah besaran vektor, yang berarti memiliki arah dan magnitudo.</p>
+                <p>Rumus momentum linear dinyatakan sebagai:</p>
+                <div class="formula-display">p = m * v</div>
+                <p>Di mana:</p>
+                <ul>
+                    <li><code>p</code> = Momentum linear (biasanya dalam kg m/s)</li>
+                    <li><code>m</code> = massa benda (biasanya dalam kilogram atau kg)</li>
+                    <li><code>v</code> = kecepatan benda (biasanya dalam meter per detik atau m/s)</li>
+                </ul>
+
+                <div class="example-box">
+                    <h4>Contoh Soal Mudah:</h4>
+                    <p>Sebuah bola kasti dengan massa 0.15 kg dilempar dengan kecepatan 30 m/s. Berapakah momentum bola kasti tersebut?</p>
+                    <h4>Langkah Penyelesaian:</h4>
+                    <ol>
+                        <li><b>Identifikasi nilai yang diketahui:</b>
+                            <ul>
+                                <li>Massa (<code>m</code>) = 0.15 kg</li>
+                                <li>Kecepatan (<code>v</code>) = 30 m/s</li>
+                            </ul>
+                        </li>
+                        <li><b>Gunakan rumus momentum:</b>
+                            <div class="formula-display">p = m * v</div>
+                        </li>
+                        <li><b>Substitusikan nilai ke dalam rumus:</b>
+                            <div class="formula-display">p = 0.15 kg * 30 m/s</div>
+                        </li>
+                        <li><b>Hitung hasilnya:</b>
+                            <div class="formula-display">p = 4.5 kg m/s</div>
+                        </li>
+                    </ol>
+                    <p><b>Jawaban:</b> Momentum bola kasti tersebut adalah 4.5 kg m/s.</p>
+                </div>
+
+                <div class="example-box">
+                    <h4>Contoh Soal Lebih Sulit:</h4>
+                    <p>Sebuah kereta api bermassa 5000 kg bergerak dengan kecepatan 15 m/s. Berapakah momentum kereta api tersebut?</p>
+                    <h4>Langkah Penyelesaian:</h4>
+                    <ol>
+                        <li><b>Identifikasi nilai yang diketahui:</b>
+                            <ul>
+                                <li>Massa (<code>m</code>) = 5000 kg</li>
+                                <li>Kecepatan (<code>v</code>) = 15 m/s</li>
+                            </ul>
+                        </li>
+                        <li><b>Gunakan rumus momentum:</b>
+                            <div class="formula-display">p = m * v</div>
+                        </li>
+                        <li><b>Substitusikan nilai ke dalam rumus:</b>
+                            <div class="formula-display">p = 5000 kg * 15 m/s</div>
+                        </li>
+                        <li><b>Hitung hasilnya:</b>
+                            <div class="formula-display">p = 75000 kg m/s</div>
+                        </li>
+                    </ol>
+                    <p><b>Jawaban:</b> Momentum kereta api tersebut adalah 75000 kg m/s.</p>
+                </div>
+
+
+                <p><b>Langkah menggunakan kalkulator ini:</b></p>
+                <ol>
+                    <li>Masukkan nilai massa (<code>m</code>) pada kolom 'Massa'.</li>
+                    <li>Masukkan nilai kecepatan (<code>v</code>) pada kolom 'Kecepatan'.</li>
+                    <li>Klik tombol 'Hitung Momentum (p)'.</li>
+                    <li>Hasil momentum (p) akan muncul di bagian 'Hasil Momentum (p)'.</li>
+                </ol>
+                <button class="hide-explanation-button" onclick="sembunyikanPenjelasan('momentum')">Sembunyikan Penjelasan</button>
+            </div>
+            <div id="visualisasiMomentum" class="visualization-area">
+                <h3>Visualisasi Momentum (Akan Hadir)</h3>
+                <p><i>Area ini akan menampilkan visualisasi interaktif dari konsep momentum.</i></p>
+            </div>
+        </div>
+
+        <div id="impulsForm" class="calculator-section" style="display:none;">
+            <h2>Kalkulator Impuls</h2>
+            <div class="formula-description">Rumus Impuls:</div>
+            <div class="formula-display">I = F * Δt</div>
+            <div class="input-group">
+                <label for="gayaImpuls">Gaya (F):</label>
+                <input type="number" id="gayaImpuls" placeholder="Masukkan gaya">
+            </div>
+            <div class="input-group">
+                <label for="waktuImpuls">Perubahan Waktu (Δt):</label>
+                <input type="number" id="waktuImpuls" placeholder="Masukkan perubahan waktu">
+            </div>
+            <button class="calculate-button" onclick="hitungImpuls()">Hitung Impuls (I)</button>
+            <button class="show-explanation-button" onclick="tampilkanPenjelasan('impuls')">Tampilkan Penjelasan & Contoh</button>
+            <div class="output-group">
+                <p>Hasil Impuls (I):</p>
+                <p id="hasilImpuls">---</p>
+            </div>
+            <div id="penjelasanImpuls" class="explanation-area">
+                <h3>Penjelasan Rumus Impuls</h3>
+                <p>Impuls adalah perubahan momentum suatu benda. Impuls terjadi ketika gaya bekerja pada benda dalam selang waktu tertentu. Impuls merupakan besaran vektor yang arahnya sama dengan arah gaya yang bekerja.</p>
+                <p>Rumus impuls dinyatakan sebagai:</p>
+                <div class="formula-display">I = F * Δt</div>
+                <p>Atau, karena impuls sama dengan perubahan momentum (Δp):</p>
+                <div class="formula-display">I = Δp</div>
+                <p>Dimana:</p>
+                <ul>
+                    <li><code>I</code> = Impuls (biasanya dalam Newton-detik atau Ns)</li>
+                    <li><code>F</code> = Gaya rata-rata yang bekerja (biasanya dalam Newton atau N)</li>
+                    <li><code>Δt</code> = Perubahan waktu atau durasi gaya bekerja (biasanya dalam detik atau s)</li>
+                    <li><code>Δp</code> = Perubahan momentum</li>
+                </ul>
+
+                <div class="example-box">
+                    <h4>Contoh Soal Mudah:</h4>
+                    <p>Sebuah gaya sebesar 20 N bekerja pada sebuah benda selama 0.5 detik. Berapakah impuls yang diberikan pada benda tersebut?</p>
+                    <h4>Langkah Penyelesaian:</h4>
+                    <ol>
+                        <li><b>Identifikasi nilai yang diketahui:</b>
+                            <ul>
+                                <li>Gaya (<code>F</code>) = 20 N</li>
+                                <li>Perubahan waktu (<code>Δt</code>) = 0.5 detik</li>
+                            </ul>
+                        </li>
+                        <li><b>Gunakan rumus impuls:</b>
+                            <div class="formula-display">I = F * Δt</div>
+                        </li>
+                        <li><b>Substitusikan nilai ke dalam rumus:</b>
+                            <div class="formula-display">I = 20 N * 0.5 s</div>
+                        </li>
+                        <li><b>Hitung hasilnya:</b>
+                            <div class="formula-display">I = 10 Ns</div>
+                        </li>
+                    </ol>
+                    <p><b>Jawaban:</b> Impuls yang diberikan pada benda tersebut adalah 10 Ns.</p>
+                </div>
+
+                <div class="example-box">
+                    <h4>Contoh Soal Lebih Sulit:</h4>
+                    <p>Sebuah bola tenis dengan massa 0.058 kg bergerak dengan kecepatan 25 m/s dan mengenai dinding. Bola tersebut memantul kembali dengan kecepatan 20 m/s dalam arah yang berlawanan. Jika waktu kontak bola dengan dinding adalah 0.01 detik, berapakah gaya rata-rata yang diberikan dinding pada bola?</p>
+                    <h4>Langkah Penyelesaian:</h4>
+                    <ol>
+                        <li><b>Identifikasi nilai yang diketahui dan yang ditanyakan:</b>
+                            <ul>
+                                <li>Massa bola (<code>m</code>) = 0.058 kg</li>
+                                <li>Kecepatan awal (<code>v<sub>awal</sub></code>) = 25 m/s (misalkan positif)</li>
+                                <li>Kecepatan akhir (<code>v<sub>akhir</sub></code>) = -20 m/s (arah berlawanan, jadi negatif)</li>
+                                <li>Perubahan waktu (<code>Δt</code>) = 0.01 detik</li>
+                                <li>Gaya rata-rata (<code>F</code>) = <b>?</b> (yang ditanyakan)</li>
+                            </ul>
+                        </li>
+                        <li><b>Hitung perubahan momentum bola:</b>
+                            <div class="formula-display">Δp = m * (v<sub>akhir</sub> - v<sub>awal</sub>)</div>
+                            <div class="formula-display">Δp = 0.058 kg * (-20 m/s - 25 m/s)</div>
+                            <div class="formula-display">Δp = 0.058 kg * (-45 m/s)</div>
+                            <div class="formula-display">Δp = -2.61 kg m/s</div>  (nilai negatif karena arah perubahan momentum berlawanan dengan kecepatan awal)
+                        </li>
+                        <li><b>Gunakan hubungan impuls dan perubahan momentum (I = Δp) dan rumus impuls (I = F * Δt) untuk mencari gaya:</b>
+                            <div class="formula-display">I = Δp = F * Δt  -->  F = Δp / Δt</div>
+                        </li>
+                        <li><b>Substitusikan nilai ke dalam rumus gaya (ambil nilai absolut karena hanya besar gaya yang ditanyakan):</b>
+                            <div class="formula-display">F = |-2.61 kg m/s| / 0.01 s</div>
+                        </li>
+                        <li><b>Hitung hasilnya:</b>
+                            <div class="formula-display">F = 261 N</div>
+                        </li>
+                    </ol>
+                    <p><b>Jawaban:</b> Gaya rata-rata yang diberikan dinding pada bola adalah 261 N.</p>
+                </div>
+
+                <p><b>Langkah menggunakan kalkulator ini:</b></p>
+                <ol>
+                    <li>Masukkan nilai gaya (<code>F</code>) pada kolom 'Gaya'.</li>
+                    <li>Masukkan nilai perubahan waktu (<code>Δt</code>) pada kolom 'Perubahan Waktu'.</li>
+                    <li>Klik tombol 'Hitung Impuls (I)'.</li>
+                    <li>Hasil impuls (I) akan muncul di bagian 'Hasil Impuls (I)'.</li>
+                </ol>
+                <button class="hide-explanation-button" onclick="sembunyikanPenjelasan('impuls')">Sembunyikan Penjelasan</button>
+            </div>
+            <div id="visualisasiImpuls" class="visualization-area">
+                <h3>Visualisasi Impuls (Akan Hadir)</h3>
+                <p><i>Area ini akan menampilkan visualisasi interaktif dari konsep impuls.</i></p>
+            </div>
+        </div>
+
+
+    </div>
+
+    <script>
+        function tampilkanForm() {
+            var selectedFormula = document.getElementById("formulaSelect").value;
+            sembunyikanSemuaForm();
+            sembunyikanSemuaPenjelasan();
+
+            if (selectedFormula) {
+                document.getElementById(selectedFormula + "Form").style.display = 'block';
+            }
+        }
+
+        function sembunyikanSemuaForm() {
+            var forms = document.querySelectorAll('.calculator-section');
+            forms.forEach(function(form) {
+                form.style.display = 'none';
+            });
+        }
+
+        // Fungsi perhitungan (tidak ada perubahan signifikan)
+        function hitungKecepatan() {
+            var jarak = parseFloat(document.getElementById("jarakKecepatan").value);
+            var waktu = parseFloat(document.getElementById("waktuKecepatan").value);
+
+            if (isNaN(jarak) || isNaN(waktu) || waktu <= 0) {
+                document.getElementById("hasilKecepatan").textContent = "Masukkan angka yang valid untuk jarak dan waktu (waktu > 0).";
+                return;
+            }
+
+            var kecepatan = jarak / waktu;
+            document.getElementById("hasilKecepatan").textContent = kecepatan.toFixed(2) + " m/s";
+        }
+
+        function hitungEnergiKinetik() {
+            var massa = parseFloat(document.getElementById("massaEnergiKinetik").value);
+            var kecepatan = parseFloat(document.getElementById("kecepatanEnergiKinetik").value);
+
+            if (isNaN(massa) || isNaN(kecepatan) || massa < 0) {
+                document.getElementById("hasilEnergiKinetik").textContent = "Masukkan angka yang valid untuk massa (massa >= 0) dan kecepatan.";
+                return;
+            }
+
+            var energiKinetik = 0.5 * massa * Math.pow(kecepatan, 2);
+            document.getElementById("hasilEnergiKinetik").textContent = energiKinetik.toFixed(2) + " Joule";
+        }
+
+        function hitungHukumNewton2() {
+            var massa = parseFloat(document.getElementById("massaNewton2").value);
+            var percepatan = parseFloat(document.getElementById("percepatanNewton2").value);
+
+            if (isNaN(massa) || isNaN(percepatan) || massa < 0) {
+                document.getElementById("hasilNewton2").textContent = "Masukkan angka yang valid untuk massa (massa >= 0) dan percepatan.";
+                return;
+            }
+
+            var gaya = massa * percepatan;
+            document.getElementById("hasilNewton2").textContent = gaya.toFixed(2) + " Newton";
+        }
+
+        function hitungEnergiPotensial() {
+            var massa = parseFloat(document.getElementById("massaEnergiPotensial").value);
+            var gravitasi = parseFloat(document.getElementById("gravitasiEnergiPotensial").value);
+            var ketinggian = parseFloat(document.getElementById("ketinggianEnergiPotensial").value);
+
+            if (isNaN(massa) || isNaN(gravitasi) || isNaN(ketinggian) || massa < 0 || ketinggian < 0) {
+                document.getElementById("hasilEnergiPotensial").textContent = "Masukkan angka yang valid untuk massa (massa >= 0) dan ketinggian (ketinggian >= 0).";
+                return;
+            }
+
+            var energiPotensial = massa * gravitasi * ketinggian;
+            document.getElementById("hasilEnergiPotensial").textContent = energiPotensial.toFixed(2) + " Joule";
+        }
+
+        function hitungMomentum() {
+            var massa = parseFloat(document.getElementById("massaMomentum").value);
+            var kecepatan = parseFloat(document.getElementById("kecepatanMomentum").value);
+
+            if (isNaN(massa) || isNaN(kecepatan) || massa < 0) {
+                document.getElementById("hasilMomentum").textContent = "Masukkan angka yang valid untuk massa (massa >= 0) dan kecepatan.";
+                return;
+            }
+
+            var momentum = massa * kecepatan;
+            document.getElementById("hasilMomentum").textContent = momentum.toFixed(2) + " kg m/s";
+        }
+
+        function hitungImpuls() {
+            var gaya = parseFloat(document.getElementById("gayaImpuls").value);
+            var deltaWaktu = parseFloat(document.getElementById("waktuImpuls").value);
+
+            if (isNaN(gaya) || isNaN(deltaWaktu) || deltaWaktu <= 0) {
+                document.getElementById("hasilImpuls").textContent = "Masukkan angka yang valid untuk gaya dan perubahan waktu (Δt > 0).";
+                return;
+            }
+
+            var impuls = gaya * deltaWaktu;
+            document.getElementById("hasilImpuls").textContent = impuls.toFixed(2) + " Ns";
+        }
+
+
+        // Fungsi untuk menampilkan dan menyembunyikan penjelasan langkah-langkah (REVISI PENTING!)
+        function tampilkanPenjelasan(formulaName) {
+            sembunyikanSemuaPenjelasan(); // Sembunyikan dulu semua penjelasan yang mungkin sedang tampil
+            var explanationId = "penjelasan" + formulaName.charAt(0).toUpperCase() + formulaName.slice(1);
+            var visualizationId = "visualisasi" + formulaName.charAt(0).toUpperCase() + formulaName.slice(1);
+
+            var explanationElement = document.getElementById(explanationId);
+            var visualizationElement = document.getElementById(visualizationId);
+
+            if (explanationElement) { // Pastikan elemen penjelasan ditemukan sebelum diubah style.display
+                explanationElement.style.display = 'block';
+            }
+             if (visualizationElement) { // Pastikan elemen visualisasi juga ditemukan sebelum diubah style.display
+                visualizationElement.style.display = 'block';
+            }
+        }
+
+        function sembunyikanPenjelasan(formulaName) {
+            var explanationId = "penjelasan" + formulaName.charAt(0).toUpperCase() + formulaName.slice(1);
+            var visualizationId = "visualisasi" + formulaName.charAt(0).toUpperCase() + formulaName.slice(1);
+
+            var explanationElement = document.getElementById(explanationId);
+            var visualizationElement = document.getElementById(visualizationId);
+
+             if (explanationElement) { // Pastikan elemen penjelasan ditemukan sebelum diubah style.display
+                explanationElement.style.display = 'none';
+            }
+             if (visualizationElement) { // Pastikan elemen visualisasi juga ditemukan sebelum diubah style.display
+                visualizationElement.style.display = 'none';
+            }
+        }
+
+        function sembunyikanSemuaPenjelasan() {
+            var explanations = document.querySelectorAll('.explanation-area');
+            explanations.forEach(function(explanation) {
+                explanation.style.display = 'none';
+            });
+            var visualizations = document.querySelectorAll('.visualization-area');
+            visualizations.forEach(function(visualization) {
+                visualization.style.display = 'none';
+            });
+        }
+
+
+        sembunyikanSemuaForm();
+        sembunyikanSemuaPenjelasan();
+
+
+    </script>
+
+</body>
+</html>
